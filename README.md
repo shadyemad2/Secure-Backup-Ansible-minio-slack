@@ -68,5 +68,16 @@ send_slack() {
 - Check service: systemctl status minio && ss -tulpn | grep 9000
 - Logs: cat /var/log/backup.log
 
+---
+
+## 🙌 Author
+
+**Shady Emad Wahib Farhat**
+
+DevOps | Linux | Kubernetes | Cloud Enthusiast  
+[LinkedIn Profile](https://www.linkedin.com/in/shadyemad)  
+[GitHub Profile](https://github.com/shadyemad)
+
+---
 
 
