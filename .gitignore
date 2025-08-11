@@ -1,0 +1,4 @@
+vault.yml
+*.gpg
+*.secret
+.env

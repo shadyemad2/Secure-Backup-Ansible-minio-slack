@@ -1,0 +1,62 @@
+#!/bin/bash
+
+export PATH=$PATH:/usr/local/bin
+BACKUP_DIRS="{{ backup_dirs }}"
+BACKUP_NAME="backup_$(hostname)_$(date +%Y%m%d_%H%M%S).tar.gz"
+ENCRYPTED_BACKUP="${BACKUP_NAME}.gpg"
+TMP_BACKUP="/tmp/${BACKUP_NAME}"
+
+MINIO_ALIAS="{{ minio_alias }}"
+MINIO_BUCKET="{{ minio_bucket }}"
+
+GPG_PASSPHRASE="{{ gpg_passphrase }}"
+SLACK_BOT_TOKEN="{{ slack_bot_token }}"
+SLACK_CHANNEL="{{ slack_channel }}"
+
+send_slack_message() {
+  local message="$1"
+  curl -s -X POST -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+       -H "Content-type: application/json" \
+       --data "{\"channel\":\"$SLACK_CHANNEL\",\"text\":\"$message\"}" \
+       https://slack.com/api/chat.postMessage > /dev/null
+}
+
+echo "Starting backup for directories: $BACKUP_DIRS"
+
+tar czf "$TMP_BACKUP" $BACKUP_DIRS
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to create tar.gz backup"
+  send_slack_message "Backup failed: could not create tarball on $(hostname) at $(date)"
+  exit 1
+else
+  echo "Tarball created at $TMP_BACKUP"
+fi
+
+echo "Encrypting backup with GPG"
+echo "$GPG_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 -c "$TMP_BACKUP"
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to encrypt backup"
+  send_slack_message " Backup failed: encryption error on $(hostname) at $(date)"
+  rm -f "$TMP_BACKUP"
+  exit 1
+else
+  echo "Backup encrypted to $TMP_BACKUP.gpg"
+fi
+
+echo "Uploading encrypted backup to MinIO at $MINIO_ALIAS/$MINIO_BUCKET"
+mc cp "$TMP_BACKUP.gpg" "${MINIO_ALIAS}/${MINIO_BUCKET}/"
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to upload backup to MinIO"
+  send_slack_message " Backup failed: upload to MinIO error on $(hostname) at $(date)"
+  rm -f "$TMP_BACKUP" "$TMP_BACKUP.gpg"
+  exit 1
+else
+  echo "Backup successfully uploaded to $MINIO_ALIAS/$MINIO_BUCKET/"
+fi
+
+rm -f "$TMP_BACKUP" "$TMP_BACKUP.gpg"
+echo "Temporary backup files removed"
+
+echo "Backup process completed successfully."
+send_slack_message " Backup completed successfully on $(hostname) at $(date)"
+

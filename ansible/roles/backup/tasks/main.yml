@@ -1,0 +1,14 @@
+- name: Deploy backup script
+  template:
+    src: backup.sh.j2
+    dest: /usr/local/bin/backup.sh
+    mode: '0755'
+
+- name: Ensure cron job for backup script
+  cron:
+    name: "Daily backup to MinIO"
+    user: root
+    minute: "0"
+    hour: "2"
+    job: "/usr/local/bin/backup.sh >> /var/log/backup.log 2>&1"
+

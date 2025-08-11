@@ -1,0 +1,6 @@
+- name: Deploy backup script and cron on clients
+  hosts: clients
+  become: true
+  roles:
+    - backup
+

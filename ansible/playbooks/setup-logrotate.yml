@@ -1,0 +1,10 @@
+- name: Configure log rotation for backup log
+  hosts: clients
+  become: yes
+  tasks:
+    - name: Deploy logrotate config
+      template:
+        src: logrotate-backup.j2
+        dest: /etc/logrotate.d/backup
+        mode: '0644'
+

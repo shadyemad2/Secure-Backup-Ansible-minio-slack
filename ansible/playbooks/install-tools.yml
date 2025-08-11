@@ -1,0 +1,48 @@
+- name: Install mc, gpg, wget and cron on clients
+  hosts: clients
+  become: yes
+  tasks:
+    - name: Install wget, gnupg and cronie (cron)
+      package:
+        name:
+          - wget
+          - gnupg
+          - cronie
+        state: present
+
+    - name: Download mc client
+      get_url:
+        url: https://dl.min.io/client/mc/release/linux-amd64/mc
+        dest: /usr/local/bin/mc
+        mode: '0755'
+
+    - name: Ensure .mc directory exists for shady
+      file:
+        path: /home/shady/.mc
+        state: directory
+        owner: shady
+        group: shady
+        mode: '0700'
+      become: false
+      become_user: shady
+
+    - name: Configure myminio alias for mc (for root user)
+      shell: mc alias set myminio http://192.168.1.3:9000 minioadmin StrongPass123!
+      args:
+        creates: /root/.mc/config.json
+
+    - name: Configure myminio alias for mc (for shady)
+      shell: >
+        /usr/local/bin/mc alias set myminio http://192.168.1.3:9000 minioadmin StrongPass123! --config /home/shady/.mc/config.json
+      args:
+        creates: /home/shady/.mc/config.json
+      become: false
+      become_user: shady
+
+    - name: Ensure backup log file exists with correct permissions
+      file:
+        path: /var/log/backup.log
+        state: touch
+        owner: root
+        group: root
+        mode: '0644'

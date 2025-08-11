@@ -1,0 +1,6 @@
+backup_dirs: "/etc/passwd"
+minio_alias: "myminio"
+minio_bucket: "backups"
+
+
+
