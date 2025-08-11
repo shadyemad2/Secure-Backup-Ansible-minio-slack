@@ -3,7 +3,7 @@
 ## Overview
 A simple and reliable backup system that collects files from clients, compresses them, encrypts them using GPG, and uploads them to a MinIO server. Integrated with Slack notifications to alert on success or failure.
 
-<img width="2816" height="1536" alt="Gemini_Generated_Image_6xt4ij6xt4ij6xt4" src="https://github.com/user-attachments/assets/5979750a-0d6e-41fb-9fbf-c35271736bc0" />
+<img width="2816" height="1536" alt="Gemini_Generated_Image_h3vrdqh3vrdqh3vr" src="https://github.com/user-attachments/assets/9842b875-3f21-4164-bf6a-f747b1e2b162" />
 
 
 ## Prerequisites
