@@ -15,7 +15,7 @@ send_slack_message() {
 # Get current MinIO bucket size in bytes
 BUCKET_SIZE_BYTES=$(mc du --json ${MINIO_ALIAS}/${MINIO_BUCKET} | jq '.totalSize')
 
-# Convert bucket size to megabytes
+## Convert bucket size to megabytes
 BUCKET_SIZE_MB=$((BUCKET_SIZE_BYTES / 1024 / 1024))
 
 echo "Current MinIO bucket size is: ${BUCKET_SIZE_MB} MB"
