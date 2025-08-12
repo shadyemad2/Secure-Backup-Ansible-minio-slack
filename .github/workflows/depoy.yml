@@ -15,10 +15,10 @@ jobs:
 
       - name: Setup SSH
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          mkdir -p $HOME/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME/.ssh/id_rsa
+          chmod 600 $HOME/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> $HOME/.ssh/known_hosts
 
       - name: Install Ansible
         run: |
@@ -30,5 +30,5 @@ jobs:
           ansible-playbook ansible/playbooks/backup.yml \
             -i "${{ secrets.SERVER_IP }}," \
             --user ${{ secrets.SERVER_USER }} \
-            --private-key ~/.ssh/id_rsa
+            --private-key $HOME/.ssh/id_rsa
 
